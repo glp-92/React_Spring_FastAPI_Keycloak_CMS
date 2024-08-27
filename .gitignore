@@ -1,0 +1,9 @@
+db
+.metadata
+mysqldb
+.env*
+images/
+__pycache__
+init.sql
+nginx.crt
+nginx.key

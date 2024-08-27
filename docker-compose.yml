@@ -1,0 +1,142 @@
+services:
+
+  nginx:
+    image: nginx:1.27.1-alpine
+    restart: always
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./backend/reverse-proxy/nginx.conf:/etc/nginx/nginx.conf
+      - ./backend/certs/nginx:/etc/nginx/certs # self signed certs
+    depends_on:
+      frontend:
+        condition: service_started
+    networks:
+      - public-subnet
+
+  frontend:
+    build: ./frontend/clientapp/
+    restart: always
+    container_name: frontend
+    # ports:
+    #   - "3000:3000"
+    depends_on:
+      blog-service:
+        condition: service_started
+      file-service:
+        condition: service_started
+    networks:
+      - public-subnet
+
+  file-service:
+    build: ./backend/filestorage-service/
+    restart: always
+    container_name: file-service
+    # ports:
+    #   - "8000:8000"
+    environment:
+      FILE_STORAGE_STATIC_FOLDER: ${FILE_STORAGE_STATIC_FOLDER}
+      FRONTEND_URL: ${FRONTEND_URL}
+    volumes:
+      - ./backend/filestorage-service/images:${FILE_STORAGE_STATIC_FOLDER}
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    networks:
+      - private-subnet
+      - public-subnet
+
+  blog-service:
+    build: ./backend/blog-service/
+    restart: always
+    container_name: blog-service
+    # ports:
+    #   - "8083:8083"
+    environment:
+      MYSQL_HOST: "db"
+      MYSQL_BLOG_SERVICE_PASSWORD: ${MYSQL_BLOG_SERVICE_PASSWORD}
+      MYSQL_BLOG_SERVICE_USER: ${MYSQL_BLOG_SERVICE_USER}
+      KEYCLOAK_BLOG_REALM_ID: ${KEYCLOAK_BLOG_REALM_ID}
+      KEYCLOAK_BLOG_CLIENT_ID: ${KEYCLOAK_BLOG_CLIENT_ID}
+      KEYCLOAK_BLOG_CLIENT_SECRET: ${KEYCLOAK_BLOG_CLIENT_SECRET}
+      KEYCLOAK_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+      KEYCLOAK_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
+      FRONTEND_URL: ${FRONTEND_URL}
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    networks:
+      - private-subnet
+      - public-subnet
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    restart: always
+    container_name: ${KEYCLOAK_HOSTNAME}-service
+    command: start --proxy-headers forwarded
+    # ports:
+      # - "${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"
+    environment:
+      KC_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
+      KC_DB: mysql
+      KC_DB_URL_HOST: mysql_svr
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DATABASE}
+      KC_DB_PASSWORD: ${KEYCLOAK_MYSQL_PASSWORD}
+      KC_DB_USERNAME: ${KEYCLOAK_MYSQL_USER}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      # Production
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
+      # KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/certs/keycloak-server.key.pem
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/certs/keycloak-server.crt.pem
+    depends_on:
+      mysql_svr:
+        condition: service_healthy
+    volumes:
+      - ./backend/certs/keycloak/:/opt/keycloak/certs/
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2048M
+        reservations:
+          cpus: '1'
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e 'GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - private-subnet
+
+  mysql_svr:
+    image: mysql:latest
+    restart: always
+    container_name: db
+    #ports:
+      #- "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./backend/mysql/db:/var/lib/mysql
+      - ./backend/mysql/initdb:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u ${MYSQL_BLOG_DB_NAME} --password=${MYSQL_PASSWORD}
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - private-subnet
+
+networks:
+  public-subnet:
+    driver: bridge
+  private-subnet:
+    driver: bridge

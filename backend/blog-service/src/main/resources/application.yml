@@ -1,0 +1,41 @@
+server:
+  port: 8083
+  max-http-request-header-size: 20000 # Desde Apisix llega un header muy grande
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        security: DEBUG
+spring:
+  application:
+    name: blog-service
+  cache:
+    type: SIMPLE
+  servlet:
+    multipart:
+      max-request-size: 20MB
+      max-file-size: 20MB
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_BLOG_DB_NAME:blog_service}
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_BLOG_SERVICE_USER:blog}
+    password: ${MYSQL_BLOG_SERVICE_PASSWORD:test}
+  jpa: 
+    hibernate:
+      ddl-auto: update
+  security: 
+    oauth2: 
+      resourceserver:  
+        jwt:  
+          issuer-uri: http://${KEYCLOAK_HOSTNAME:localhost}:${KEYCLOAK_HTTP_PORT:9000}/realms/${KEYCLOAK_BLOG_REALM_ID:blog}
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+          token-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/token
+          revoke-token-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/logout
+          client-secret: ${KEYCLOAK_BLOG_CLIENT_SECRET:hUSOjHHz8mIBi84e3RFP9O8dIvtOKSBo}
+jwt:  
+  auth:  
+    converter: 
+      resource-id: ${KEYCLOAK_BLOG_CLIENT_ID:blog-client}
+      principal-attribute: principal_username
+front-origin: ${FRONTEND_URL:http://localhost:3000}
