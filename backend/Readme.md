@@ -1,33 +1,69 @@
-# CMS Backend
+# Spring Keycloak FastAPI Backend
 
 Implemented with Spring Boot, FastAPI, Spring Security and Keycloak. Currently using `MySQL` for Spring Boot and Keycloak
 
-## Setup Keycloak 0Auth2Server
+## MySQL
 
-For the application, realm, client, user and roles are needed.
+### Setup
+
+#### On Docker
+
+1. To create automatically databases and users for the `docker compose` command, is needed to run `generate_initdb.sh`
+```bash
+source .example.env # load env variables on terminal session
+mkdir ./backend/mysql/initdb
+bash ./backend/mysql/generate_initdb.sh
+```
+
+#### On current System
+
+1. Install `mysql` on system, `docker` has already available images.
+```bash
+sudo apt install mysql-server -y
+sudo systemctl enable mysql.service
+sudo mysql
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpwd';
+mysql -u root -p
+```
+2. Setup all the databases manually
+```sql
+CREATE USER IF NOT EXISTS 'mysqlusr'@'%' IDENTIFIED WITH 'caching_sha2_password' BY 'mysqlpwd';
+CREATE USER IF NOT EXISTS 'keycloak_usr'@'%' IDENTIFIED WITH 'caching_sha2_password' BY 'keycloak_pwd';
+CREATE DATABASE IF NOT EXISTS keycloak CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON keycloak.* TO 'keycloak_usr'@'%';
+CREATE USER IF NOT EXISTS 'blog'@'%' IDENTIFIED WITH 'caching_sha2_password' BY 'blogservice_pwd';
+CREATE DATABASE IF NOT EXISTS blog_service;
+GRANT ALL PRIVILEGES ON blog_service.* TO 'blog'@'%';
+FLUSH PRIVILEGES;
+```
+
+## Keycloak OAuthServer
+
+### Setup
+
+For application identity management, realm, client, user and roles are needed.
 
 1. Run Keycloak container 
-```
-cd auth-service
+```bash
 sudo docker compose up
 ```
-2. `http:localhost:9000/admin` to open admin console (usr and password provided on compose secret)
+2. `http:localhost:8080/admin` to open admin console (usr and password provided on compose secret)
 3. Build new realm `blog`
 4. Go to clients section and create new client `blog-client`. All by default but `Client Authentication` ON and `Valid redirect URIs` *
 5. Create new User `username` and confirm email. Maybe first name and last name are required by Keycloak to successful login.
 6. To create `ADMIN` role, on created client section, tab `Roles` `Create role`. Set name to `ADMIN`
 7. Map role to user. `Users` => select user => `Role mapping` => `Assign role` => `Filter by clients` => Select `ADMIN` role
 8. Must provide client secret to backend. `Clients` => `blog-client` => `Credentials` => `Client Secret`
-9. Login user `http://localhost:9000/realms/blog/account`
+9. Login user `http://localhost:8080/realms/blog/account`
 
 Specify OAuth2 config on Spring Boot App properties.yaml
-```
+```yaml
 spring:
   security: 
     oauth2: 
       resourceserver:  
         jwt:  
-          issuer-uri: http://localhost:9000/realms/blog
+          issuer-uri: http://localhost:8080/realms/blog
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
           token-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/token
           revoke-token-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/logout
@@ -39,41 +75,7 @@ jwt:
       principal-attribute: principal_username
 ```
 
-## Blog Service
-
-On `pom.xml` dependencies are specified
-
-If using `Eclipse IDE` `boot dashboard` is useful to launch server. Go to Eclipse marketplace and install `Spring Tools 4`. Once installed `Window` => `Show view` => `Other` => `Boot Dashboard`
-
-## Java VM
-```
-sudo apt reinstall openjdk-17-jd
-```
-
-**By default, Lombok is not installed for Eclipse**
-
-1. Download .jar `https://projectlombok.org/download`
-2. Run `java -jar lombok.jar`
-3. Specify Eclipse install location, example `/home/user/eclipse/java-2023-12/eclipse`
-4. `Install/Update`
-
-## MySQL
-
-Spring Boot backend currently uses MySQL database for data persisting.
-
-Install, create DB and USER.
-```
-sudo apt install mysql-server -y
-sudo systemctl enable mysql.service
-sudo mysql
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpwd';
-mysql -u root -p
-CREATE USER 'blog'@'localhost' IDENTIFIED BY 'blogpwd'
-CREATE DATABASE blog_service;'
-GRANT ALL PRIVILEGES ON blog_service.* TO 'blog'@'localhost';
-```
-
-## Postman auth endpoint testing
+### Postman auth endpoint testing
 
 - Get JWT Token
   - POST `http://localhost:9000/realms/realmName/protocol/openid-connect/token` Body `x-www-form-urlencoded`
@@ -83,18 +85,89 @@ GRANT ALL PRIVILEGES ON blog_service.* TO 'blog'@'localhost';
   - password: userPassword
   - client_secret: clientSecret
   
-## MFA With authenticator
+### MFA With authenticator
 
 1. Select blog realm => Authentication => Required Actions => Configure OTP => Enabled ON / Set as default Action ON
 2. Policies tab => OTP Policy => Configure custom OTP settings (preferred low expiration time)
 3. Users => Select user => Required Actions => Configure OTP
 
-Once configure checked, must login with Keycloak at `http://localhost:9000/realms/blog/account`
+Once configure checked, must login with Keycloak at `http://localhost:8080/realms/blog/account`
 
 4. Download Microsoft / Google authenticator and scan QR provided by login page
 5. OTP must be included on login form as:
   - topt: otpKey
-  
-## References and useful links
+
+## Blog Service
+
+### Setup
+
+#### On current System
+
+1. On `pom.xml` dependencies are already specified
+2. If using `Eclipse IDE` `boot dashboard` is useful to launch server. Go to Eclipse marketplace and install `Spring Tools 4`. Once installed `Window` => `Show view` => `Other` => `Boot Dashboard`
+3. Install `Java JDK`
+```bash
+sudo apt reinstall openjdk-17-jd
+```
+3. `Project Lombok` is not installed in Eclipse
+  1. Download .jar `https://projectlombok.org/download`
+  2. Run `java -jar lombok.jar`
+  3. Specify Eclipse install location, example `/home/user/eclipse/java-2023-12/eclipse`
+  4. `Install/Update`
+
+#### On Docker
+
+1. Generate `jar` file from the application that will be placed on `./target`
+```bash
+sudo apt reinstall openjdk-17-jdk # If in a VM for deploy
+cd backend/blog-service
+./mvnw clean install -DskipTests # with ls a mvnw file should be placed, will test with database so if it's not installed, skip it
+```
+2. Dockerfile to build the image
+```dockerfile
+FROM openjdk:17-jdk-alpine
+RUN addgroup -S spring && adduser -S spring -G spring # Using user different from root
+USER spring:spring
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+```
+
+### References and useful links
 
 https://snyk.io/blog/guide-to-input-validation-with-spring-boot/
+
+## File Storage Server
+
+Served with `FastAPI`, provides an easy way to setup a file server
+
+### Setup
+
+#### On current System
+
+[Anaconda](https://www.anaconda.com/) is strongly recommended to setup `Python` environments
+
+1. Activate an environment
+```bash
+conda activate envname # (if anaconda)
+source ./backend/filestorage-service/env/bin/activate # (if virtualenv)
+```
+2. Install requirements
+```bash
+cd backend/filestorage-service
+pip install -r requirements.txt
+```
+3. Run APP
+```bash
+cd app
+uvicorn main:app --port 8000 --host 0.0.0.0
+```
+
+#### On Docker
+
+A `Dockerfile` is provided and install everything needed
+
+1. Run `docker-compose` with all the services
+```bash
+docker compose up --build
+```

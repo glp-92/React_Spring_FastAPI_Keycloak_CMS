@@ -1,3 +1,10 @@
 # React Spring Keycloak CMS
 
-CMS from scratch using [React with Vite](https://vitejs.dev/) as frontend, [Java Springboot](https://spring.io/projects/spring-boot) as blog service (posts, categories...) and [Python with FastAPI](https://fastapi.tiangolo.com/) as static file retrieve service (serving images, videos...). [MySQL database](https://www.mysql.com/) and deployment with [Docker](https://www.docker.com/)
+:warning: This branch works as testing branch, do not use this code in production. Production code is in `main` branch which has some security improvements
+
+- Single entrypoint with `Nginx`
+- `Keycloak` production mode, optimized for VPS with low resource (start-dev throws 404 error ocasionally)
+- Instructions for `Ubuntu Server` hardening, `Docker` hardening and `Nginx` hardening
+
+[Frontend Docs](/frontend/Readme.md)
+[Backend Docs](/backend/Readme.md)

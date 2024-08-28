@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # source .env
 # mkdir ./backend/mysql/initdb
 # bash ./backend/mysql/generate_initdb.sh

@@ -14,8 +14,8 @@ spring:
     type: SIMPLE
   servlet:
     multipart:
-      max-request-size: 20MB
-      max-file-size: 20MB
+      max-request-size: 1MB
+      max-file-size: 1MB
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_BLOG_DB_NAME:blog_service}
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -28,7 +28,7 @@ spring:
     oauth2: 
       resourceserver:  
         jwt:  
-          issuer-uri: http://${KEYCLOAK_HOSTNAME:localhost}:${KEYCLOAK_HTTP_PORT:9000}/realms/${KEYCLOAK_BLOG_REALM_ID:blog}
+          issuer-uri: ${KEYCLOAK_PROTOCOL:http}://${KEYCLOAK_HOSTNAME:localhost}:${KEYCLOAK_PORT:9000}/realms/${KEYCLOAK_BLOG_REALM_ID:blog}
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
           token-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/token
           revoke-token-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/logout

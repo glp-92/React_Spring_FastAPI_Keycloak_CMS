@@ -40,5 +40,5 @@ async def custom_origin_middleware(request: Request, call_next):
             content=ex.detail
         )
 
-static_folder = os.getenv('FILE_STORAGE_STATIC_FOLDER', '../images')
+static_folder = os.getenv('FILE_STORAGE_STATIC_FOLDER', './../images')
 app.mount("/static", StaticFiles(directory=static_folder), name="static")
