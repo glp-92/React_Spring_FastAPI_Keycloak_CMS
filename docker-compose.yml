@@ -62,7 +62,8 @@ services:
       KEYCLOAK_BLOG_CLIENT_ID: ${KEYCLOAK_BLOG_CLIENT_ID}
       KEYCLOAK_BLOG_CLIENT_SECRET: ${KEYCLOAK_BLOG_CLIENT_SECRET}
       KEYCLOAK_HOSTNAME: ${KEYCLOAK_HOSTNAME}
-      KEYCLOAK_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
+      KEYCLOAK_PORT: ${KEYCLOAK_PORT}
+      KEYCLOAK_PROTOCOL: ${KEYCLOAK_PROTOCOL}
       FRONTEND_URL: ${FRONTEND_URL}
     depends_on:
       keycloak:
@@ -74,12 +75,12 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     restart: always
-    container_name: ${KEYCLOAK_HOSTNAME}-service
+    container_name: ${KEYCLOAK_HOSTNAME}
     command: start --proxy-headers forwarded
     # ports:
-      # - "${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"
+      # - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
     environment:
-      KC_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
+      KC_HTTP_PORT: ${KEYCLOAK_PORT}
       KC_DB: mysql
       KC_DB_URL_HOST: mysql_svr
       KC_DB_URL_DATABASE: ${KEYCLOAK_DATABASE}
@@ -91,7 +92,6 @@ services:
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_HTTPS: false
       KC_HTTP_ENABLED: true
-      # KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
       KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/certs/keycloak-server.key.pem
       KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/certs/keycloak-server.crt.pem
     depends_on:

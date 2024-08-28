@@ -42,6 +42,7 @@ npm install @mui/icons-material
 ```
 
 ## Run project
+
 1. First time, is needed to build libraries 
   - `cd frontend/clientapp`
   - `npm install`
@@ -90,10 +91,16 @@ CMD [ "serve", "-s", "dist" ]
 ```yaml
 services:
   frontend:
-    build: ./frontend/clientapp/ # where Dockerfile is placed
+    build: ./frontend/clientapp/
+    restart: always
     container_name: frontend
-    ports:
-      - "3000:3000"
-    depends_on: 
-      - blog-service
+    # ports:
+    #   - "3000:3000"
+    depends_on:
+      blog-service:
+        condition: service_started
+      file-service:
+        condition: service_started
+    networks:
+      - public-subnet
 ```

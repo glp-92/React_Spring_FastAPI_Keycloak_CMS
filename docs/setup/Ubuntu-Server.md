@@ -1,4 +1,4 @@
-## Ubuntu Server Hardening
+# Setup
 
 1. Update system and install basic utilities
 ```bash
@@ -9,7 +9,10 @@ sudo apt autoremove -y
 sudo apt autoclean -y
 sudo apt install net-tools -y
 sudo apt install sysstat -y
+sudo apt install openssh-server -y
 ```
+
+# Server Hardening
 
 2. Automatic upgrades
 ```bash
@@ -34,17 +37,17 @@ cat ~/.ssh/id_rsa.pub | ssh user@ip "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized
 ```
   - Need to edit these lines on /etc/ssh/sshd_config
 ```bash 
-port xxx
+port xxx # change default port
 PermitRootLogin No 
-AddressFamily inet
-PasswordAuthentication no
-PermitEmptyPasswords no
-X11Forwarding no
+AddressFamily inet # only Ipv4
+PasswordAuthentication no # only certs
+PermitEmptyPasswords no # only certs
+X11Forwarding no # disallow desktop forwarding
 AllowTcpForwarding no
 MaxAuthTries 3
 ClientAliveInterval 300
 ClientAliveCountMax 0
-PermitUserEnvironment yes ## CAUTION: only used when loading .env variables to create de init.sql file
+PermitUserEnvironment no ## CAUTION: only "yes" when loading .env variables to create de init.sql file. Better fill fields with own db params
 ```
   - `sudo systemctl restart sshd`
 
@@ -75,54 +78,9 @@ findtime = 600
 sudo ufw status # see installed
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-sudo ufw allow xxx/tcp # ssh port
-sudo ufw allow http
-sudo ufw allow https
+sudo ufw allow xxx/tcp # ssh defined port
+sudo ufw allow http # port 80
+sudo ufw allow https # port 443
 sudo ufw enable
 sudo ufw status verbose
-```
-
-
-
-## Docker hardening
-
-1. Install docker
-```bash
-sudo apt-get update -y
-sudo apt-get install ca-certificates curl -y
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update -y
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-sudo systemctl enable docker
-sudo systemctl restart docker
-```
-
-2. Add non-root user (created on init) to docker group `sudo usermod -aG docker username`
-
-3. Check docker security by running bench security utility
-```bash 
-git clone https://github.com/docker/docker-bench-security.git
-cd docker-bench-security
-sudo sh docker-bench-security.sh
-```
-
-### Utilities 
-
-Delete all containers and volumes
-```bash 
-docker rm -vf $(docker ps -aq)
-```
-Delete all images 
-```bash
-docker rmi -f $(docker images -aq)
-```
-Build again images
-```bash
-docker compose up --build
 ```
