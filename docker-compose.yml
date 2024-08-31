@@ -123,7 +123,7 @@ services:
     container_name: ${KEYCLOAK_HOSTNAME}
     command: start --proxy-headers forwarded
     # ports:
-      # - "${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"
+    # - "${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"
     user: 1000:1000 # default 1000 user, 0 group
     environment:
       KC_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
@@ -138,8 +138,8 @@ services:
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_HTTPS: false
       KC_HTTP_ENABLED: true
-      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/certs/keycloak-server.key.pem
-      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/certs/keycloak-server.crt.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/certs/keycloak.key.pem
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/certs/keycloak.crt.pem
     depends_on:
       mysql_svr:
         condition: service_healthy
