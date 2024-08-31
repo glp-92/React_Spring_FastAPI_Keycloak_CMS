@@ -7,6 +7,6 @@ CMS from scratch using
   - [MySQL database](https://www.mysql.com/)
   - Deployed with [Docker](https://www.docker.com/)
 
-:warning: `.env` and `config files` files are `gitignored` but `.example.env` files are provided to see the configuration. These files must be renamed and configured as needed (ip, ports...)
-  - `./.example.env` => `./.env`
-  - `./frontend/clientapp/.example.env` => `./frontend/clientapp/.env.production`
+## Run App
+
+Visit [Deploy Guide](./docs/Deploy.md) to run server instance. Tested on `Ubuntu 22.04 Desktop` and `Ubuntu 22.04 Server`

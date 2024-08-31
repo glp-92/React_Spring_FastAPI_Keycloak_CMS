@@ -145,7 +145,7 @@ services:
         condition: service_healthy
     volumes:
       - ./backend/certs/keycloak/:/opt/keycloak/certs/
-      - ./backend/auth-service/:/opt/keycloak/data/import
+      - ./backend/auth-service/realm-data:/opt/keycloak/data/import
     deploy:
       resources:
         limits:
