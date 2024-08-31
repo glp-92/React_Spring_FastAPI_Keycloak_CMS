@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { ValidateToken } from '../../util/requests/Auth';
 import { LoginRequest } from "../../util/requests/Auth";
+import Loading from '../../components/loading/Loading';
 
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -13,9 +14,12 @@ import Typography from '@mui/material/Typography';
 const Login = () => {
   const navigate = useNavigate();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleLogin = async (e) => { // Envia el formulario de login, carga el token en almacenamiento
     e.preventDefault(); // Previene el comportamiento por defecto, en caso de un form, refrescar la pagina
     const data = new FormData(e.currentTarget);
+    setIsLoading(true);
     try {
       const login_response = await LoginRequest(data.get("username"), data.get("password"), data.get("totp"))
       if (login_response != null) {
@@ -24,6 +28,7 @@ const Login = () => {
     } catch (error) {
       console.error(`${error}`);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => { // Se verifica si se esta logueado actualmente y se redirige al panel de administracion
@@ -35,15 +40,18 @@ const Login = () => {
         }
       } catch (error) {
       }
-      
-      
+
+
     }
 
     fetchTokenValid();
   }, [])
 
   return (
-    <>
+    <Box>
+      {isLoading &&
+        <Loading height={0} />
+      }
       <Box
         sx={{
           marginTop: 2,
@@ -54,7 +62,7 @@ const Login = () => {
         }}
       >
         <Avatar sx={{ m: 1, mb: 1, bgcolor: 'secondary.main' }}>
-          <LockOutlinedIcon sx={{fontSize: '1.5rem'}} />
+          <LockOutlinedIcon sx={{ fontSize: '1.5rem' }} />
         </Avatar>
         <Typography variant="h1">
           Sign in
@@ -68,7 +76,7 @@ const Login = () => {
             label="Username"
             name="username"
             autoFocus
-            sx={{bgcolor:"input.light"}}
+            sx={{ bgcolor: "input.light" }}
           />
           <TextField
             margin="normal"
@@ -79,7 +87,7 @@ const Login = () => {
             type="password"
             id="password"
             autoComplete="current-password"
-            sx={{bgcolor:"input.light"}}
+            sx={{ bgcolor: "input.light" }}
           />
           <TextField
             margin="normal"
@@ -89,12 +97,13 @@ const Login = () => {
             label="OTP Key"
             type="password"
             id="totpKey"
-            sx={{bgcolor:"input.light"}}
+            sx={{ bgcolor: "input.light" }}
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
+            disabled={isLoading}
             sx={{ mt: 3, mb: 2 }}
           >
             Sign In
@@ -102,7 +111,7 @@ const Login = () => {
 
         </Box>
       </Box>
-    </>
+    </Box>
   )
 }
 

@@ -7,10 +7,13 @@ import Box from '@mui/material/Box';
 
 const Logout = () => {
     const [loggedOut, setLoggedOut] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleLogout = async () => {
+        setIsLoading(true)
         const success = await LogoutRequest();
         setLoggedOut(success);
+        setIsLoading(false)
     };
 
     useEffect(() => {
@@ -20,9 +23,12 @@ const Logout = () => {
 
     return (
         <Box>
-            {loggedOut ? (
+            {isLoading &&
+                <Loading height={0} />
+            }
+            {loggedOut &&
                 <Navigate to="/" replace={true} />
-            ) : <Loading/>}
+            }
         </Box>
 
     )
