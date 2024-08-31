@@ -51,14 +51,14 @@ PermitUserEnvironment no ## CAUTION: only "yes" when loading .env variables to c
 ```
   - `sudo systemctl restart sshd`
 
-5. Fail2Ban utility => intrusion prevention system that monitors log files and ban suspicious IP addresses. 
+5. Fail2Ban utility => intrusion prevention system that monitors log files and ban suspicious IP addresses by using `iptables`. 
 - [Tutorial](https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-20-04)
 - [Tutorial 2](https://medium.com/@bnay14/installing-and-configuring-fail2ban-to-secure-ssh-1e4e56324b19)
 - [Tutorial 3](https://mytcpip.com/fail2ban-ssh/)
 ```bash
 sudo apt install fail2ban
-sudo nano /etc/fail2ban/jail.conf
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo nano /etc/fail2ban/jail.conf
 ```
 Edit ssh section
 ```bash
@@ -73,7 +73,7 @@ findtime = 600
 ```
 `sudo systemctl restart fail2ban`
 
-6. UFW firewall
+6. UFW firewall. Default installed on `Ubuntu Server`. Abstraction of `iptables`
 ```bash
 sudo ufw status # see installed
 sudo ufw default deny incoming

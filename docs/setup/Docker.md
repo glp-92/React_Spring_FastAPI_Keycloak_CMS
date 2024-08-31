@@ -18,9 +18,11 @@ sudo systemctl restart docker
 
 # Docker Hardening
 
+Attackers will attemp to escalate privileges by exploiting misconfigurations or vulnerabilities found in running containers. To mitigate that, is important to make some configurations for [host](./Ubuntu-Server.md) and container runtime hardening.
+
 1. Add non-root user (created on init) to docker group `sudo usermod -aG docker username`
 
-2. Check docker security by running bench security utility
+last. Check docker security by running bench security utility
 ```bash 
 git clone https://github.com/docker/docker-bench-security.git
 cd docker-bench-security

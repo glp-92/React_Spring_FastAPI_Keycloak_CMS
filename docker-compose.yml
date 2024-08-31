@@ -7,28 +7,36 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    # user: 1000:1000
     volumes:
       - ./backend/reverse-proxy/nginx.conf:/etc/nginx/nginx.conf
       - ./backend/certs/nginx:/etc/nginx/certs # self signed certs
     depends_on:
       frontend:
         condition: service_started
+    security_opt:
+      - no-new-privileges:true
     networks:
       - public-subnet
+      - private-subnet
 
   frontend:
     build: ./frontend/clientapp/
+    read_only: true
     restart: always
     container_name: frontend
     # ports:
     #   - "3000:3000"
+    user: 1000:1000
     depends_on:
       blog-service:
         condition: service_started
       file-service:
         condition: service_started
+    security_opt:
+      - no-new-privileges:true
     networks:
-      - public-subnet
+      - private-subnet
 
   file-service:
     build: ./backend/filestorage-service/
@@ -36,6 +44,7 @@ services:
     container_name: file-service
     # ports:
     #   - "8000:8000"
+    # user: 1000:1000 # already created non-root user on dockerfile (fastapi)
     environment:
       FILE_STORAGE_STATIC_FOLDER: ${FILE_STORAGE_STATIC_FOLDER}
       FRONTEND_URL: ${FRONTEND_URL}
@@ -44,9 +53,10 @@ services:
     depends_on:
       keycloak:
         condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
     networks:
       - private-subnet
-      - public-subnet
 
   blog-service:
     build: ./backend/blog-service/
@@ -54,6 +64,7 @@ services:
     container_name: blog-service
     # ports:
     #   - "8083:8083"
+    # user: 1000:1000 # already on Dockerfile from Spring DOC
     environment:
       MYSQL_HOST: "db"
       MYSQL_BLOG_SERVICE_PASSWORD: ${MYSQL_BLOG_SERVICE_PASSWORD}
@@ -62,15 +73,16 @@ services:
       KEYCLOAK_BLOG_CLIENT_ID: ${KEYCLOAK_BLOG_CLIENT_ID}
       KEYCLOAK_BLOG_CLIENT_SECRET: ${KEYCLOAK_BLOG_CLIENT_SECRET}
       KEYCLOAK_HOSTNAME: ${KEYCLOAK_HOSTNAME}
-      KEYCLOAK_PORT: ${KEYCLOAK_PORT}
-      KEYCLOAK_PROTOCOL: ${KEYCLOAK_PROTOCOL}
+      KEYCLOAK_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
       FRONTEND_URL: ${FRONTEND_URL}
     depends_on:
       keycloak:
         condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
     networks:
       - private-subnet
-      - public-subnet
+      - data-subnet
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
@@ -78,9 +90,10 @@ services:
     container_name: ${KEYCLOAK_HOSTNAME}
     command: start --proxy-headers forwarded
     # ports:
-      # - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
+      # - "${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"
+    user: 1000:1000 # default 1000 user, 0 group
     environment:
-      KC_HTTP_PORT: ${KEYCLOAK_PORT}
+      KC_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
       KC_DB: mysql
       KC_DB_URL_HOST: mysql_svr
       KC_DB_URL_DATABASE: ${KEYCLOAK_DATABASE}
@@ -112,8 +125,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    security_opt:
+      - no-new-privileges:true
     networks:
       - private-subnet
+      - data-subnet
 
   mysql_svr:
     image: mysql:latest
@@ -132,11 +148,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    security_opt:
+      - no-new-privileges:true
     networks:
-      - private-subnet
+      - data-subnet
 
 networks:
   public-subnet:
     driver: bridge
   private-subnet:
     driver: bridge
+    internal: true
+  data-subnet:
+    driver: bridge
+    internal: true
