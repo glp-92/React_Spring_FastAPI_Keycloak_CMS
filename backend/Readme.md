@@ -75,6 +75,37 @@ jwt:
       principal-attribute: principal_username
 ```
 
+### Alternative importing existing Realm Data
+
+Keycloak can import an existing realm configuration on `.json` format. [Example of cfg](./../backend/auth-service/blog-realm-example.json)
+
+To export an existing realm config, on Keycloak Admin Console
+
+1. Go to selected Realm.
+2. Click Realm Settings
+3. Click Action => Partial Export => Select what needed
+
+With this method, users are not exported. To add them to exported file
+
+1. `docker ps` to locate container running Keycloak
+2. `sudo docker exec -it containerId /bin/bash`
+3. `opt/keycloak/bin/kc.sh export --dir /opt/keycloak/data --realm realmName --users realm_file`
+4. `cd opt/keycloak/data/`
+5. `ls` and choose file according to export
+6. `cat filename.json | grep -n "username"` will be easier getting lines where a searched user is placed
+7. `cat filename.json` and copy "users" list section that contains users grepped before
+8. Add the "users" section to `json` file
+
+To import all Realm Data on `Docker-compose` a volume can be shared so Keycloak, on boot, will try to import `json` files that are placed into that folder with `--import-realm` flag
+
+```yaml 
+keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev --proxy-headers forwarded --import-realm
+    volumes:
+      - ./backend/auth-service/:/opt/keycloak/data/import
+```
+
 ### Postman auth endpoint testing
 
 - Get JWT Token
