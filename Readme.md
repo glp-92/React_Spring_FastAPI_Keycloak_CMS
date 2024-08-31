@@ -9,3 +9,13 @@
 [Frontend Docs](/frontend/Readme.md)
 
 [Backend Docs](/backend/Readme.md)
+
+## Run / Stop App
+
+To run App, development `env` file must be chosen (copy `.example.env` file)
+
+`sudo docker compose --env-file ./.env.development up`
+
+To stop App
+
+`sudo docker compose --env-file ./.env.development down`
