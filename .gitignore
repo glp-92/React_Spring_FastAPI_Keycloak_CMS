@@ -7,3 +7,5 @@ __pycache__
 init.sql
 nginx.crt
 nginx.key
+keycloak.crt.pem
+keycloak.key.pem
