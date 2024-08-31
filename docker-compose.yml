@@ -90,14 +90,14 @@ services:
     #   - "8083:8083"
     # user: 1000:1000 # already on Dockerfile from Spring DOC
     environment:
-      MYSQL_HOST: "db"
+      MYSQL_HOST: "mysql_svr"
       MYSQL_BLOG_SERVICE_PASSWORD: ${MYSQL_BLOG_SERVICE_PASSWORD}
       MYSQL_BLOG_SERVICE_USER: ${MYSQL_BLOG_SERVICE_USER}
       KEYCLOAK_BLOG_REALM_ID: ${KEYCLOAK_BLOG_REALM_ID}
       KEYCLOAK_BLOG_CLIENT_ID: ${KEYCLOAK_BLOG_CLIENT_ID}
       KEYCLOAK_BLOG_CLIENT_SECRET: ${KEYCLOAK_BLOG_CLIENT_SECRET}
       KEYCLOAK_HOSTNAME: ${KEYCLOAK_HOSTNAME}
-      KEYCLOAK_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
+      KEYCLOAK_PORT: ${KEYCLOAK_PORT}
       KEYCLOAK_PROTOCOL: ${KEYCLOAK_PROTOCOL}
       FRONTEND_URL: ${FRONTEND_URL}
     depends_on:
@@ -123,10 +123,10 @@ services:
     container_name: ${KEYCLOAK_HOSTNAME}
     command: start --proxy-headers forwarded --import-realm
     # ports:
-    # - "${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"
+    # - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
     user: 1000:1000 # default 1000 user, 0 group
     environment:
-      KC_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
+      KC_HTTP_PORT: ${KEYCLOAK_PORT}
       KC_DB: mysql
       KC_DB_URL_HOST: mysql_svr
       KC_DB_URL_DATABASE: ${KEYCLOAK_DATABASE}
@@ -158,7 +158,7 @@ services:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e 'GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
     security_opt:
       - no-new-privileges:true
     networks:
@@ -168,7 +168,7 @@ services:
   mysql_svr:
     image: mysql:latest
     restart: always
-    container_name: db
+    container_name: mysql_svr
     #ports:
       #- "3306:3306"
     environment:
@@ -200,7 +200,5 @@ networks:
     driver: bridge
   private-subnet:
     driver: bridge
-    internal: true
   data-subnet:
     driver: bridge
-    internal: true
