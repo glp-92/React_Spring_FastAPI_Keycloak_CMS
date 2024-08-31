@@ -13,7 +13,7 @@ If any change is made to these files and frontend image is already built, must b
 
 An example file of needed env variables for **development**
 ```
-VITE_BACKEND_URL=http://localhost:8083 # When using develop branch, containers are exposed to system, so blog service is exposed on `localhost:808
+VITE_BACKEND_URL=http://localhost:8083 # When using develop branch, containers are exposed to system, so blog service is exposed on localhost:8083
 ```
 
 An example file of needed env variables for **production**

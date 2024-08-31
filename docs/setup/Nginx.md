@@ -43,12 +43,14 @@ http {
   - Set the path of `.crt` and `.key` for `ssl` certs
 ```
 server {
-    listen 80 http2;
+    listen 80;
+    http2  on;
     # server_name www.example.com;
     return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
+    http2  on;
     # server_name www.example.com;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_certificate /etc/nginx/certs/nginx.crt;

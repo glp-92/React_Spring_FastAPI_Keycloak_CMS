@@ -13,7 +13,7 @@
 ## Steps to download and run Application
 
 1. Clone repo `git clone https://github.com/glp-92/React_Spring_FastAPI_Keycloak_CMS.git`
-2. :warning: `.env` and `config files` files are `gitignored` but `.example.env` files are provided to see the configuration. These files must be renamed and configured as needed (ip, ports...)
+2. :warning: `.env` and config files are `gitignored` but `.example.env` files are provided to see the configuration. These files must be renamed and configured as needed (ip, ports...)
     - `./.example.env` => `./.env.production`
     - `./frontend/clientapp/.example.env` => `./frontend/clientapp/.env.production`
 
