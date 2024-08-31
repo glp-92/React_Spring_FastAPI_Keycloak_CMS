@@ -27,22 +27,22 @@ Attackers will attemp to escalate privileges by exploiting misconfigurations or 
   ```
 
 2. Set an unprivileged user for every container if possible
-  1. On `Docker compose`
-  ```yaml
-  frontend:
-    user: 1000:1000 # first normal non-root user
-  ```
-  2. On `Dockerfile`
-  ```
-  RUN useradd -ms /bin/bash newuser
-  USER newuser
-  ```
-  3. Create / Edit `/etc/docker/daemon.json`
-  ```json
-  {
-    "userns-remap": "default"
-  }
-  ```
+    1. On `Docker compose`
+    ```yaml
+    frontend:
+      user: 1000:1000 # first normal non-root user
+    ```
+    2. On `Dockerfile`
+    ```
+    RUN useradd -ms /bin/bash newuser
+    USER newuser
+    ```
+    3. Create / Edit `/etc/docker/daemon.json`
+    ```json
+    {
+      "userns-remap": "default"
+    }
+    ```
 
 3. Never user `--privileged` flag when running containers. If possible use `--cap-drop all` flag to remove all kernel capabilities to container and add required with `--cap-add xxx` flag
 
