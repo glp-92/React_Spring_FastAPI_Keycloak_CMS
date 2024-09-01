@@ -7,6 +7,12 @@ CMS from scratch using
   - [MySQL database](https://www.mysql.com/)
   - Deployed with [Docker](https://www.docker.com/)
 
+## App Design
+
+Documents for the project design are the following
+
+[SQL Database Design and Spring annotations](./docs/design/DB-Design.md)
+
 ## Run App
 
 Visit [Deploy Guide](./docs/Deploy.md) to run server instance. Tested on `Ubuntu 22.04 Desktop` and `Ubuntu 22.04 Server`
