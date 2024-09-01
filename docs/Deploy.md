@@ -34,10 +34,10 @@
     ```
 5. Generate `ssl` certificates (currently self-signed)
     ```bash
-    cd backend/certs/keycloak
+    cd backend/auth-service/certs
     bash generate_certs.sh
-    cd ..
-    cd nginx
+    cd ../../..
+    cd frontend/reverse-proxy/certs
     bash generate_certs.sh
     ```
 6. `docker compose --env-file ./.env.production up --build`
