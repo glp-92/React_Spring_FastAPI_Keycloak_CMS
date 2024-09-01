@@ -2,11 +2,11 @@
 
 Next picture describe relationship between entities
 
-<img src="../source/DB_Design.webp" width="800" style="display: block; margin: 0 auto">
+<img src="../source/DB_Design.webp" width="800">
 
 In addition to relationships, the following considerations have been made
 
-- Users
+- `Users` entity
   ```java
   @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonBackReference 
@@ -16,7 +16,7 @@ In addition to relationships, the following considerations have been made
   - `OrphanRemoval` and `CascadeType.ALL` together ensure that a user's associated posts are automatically deleted when the user is deleted.
   - `JsonBackReference` prevents infinite recursion when serializing the user object, as the user object would reference the posts, which would in turn reference the user, creating a circular dependency.
 
-- Posts
+- `Posts` entity
   ```java
   @ManyToMany
   @JoinTable(
@@ -39,7 +39,7 @@ In addition to relationships, the following considerations have been made
   ```
   - `JoinColumn` is used for many-to-one relationship and points to the id of the table that owns "many" of these entities. users is the User table name
 
-- Categories
+- `Categories` entity
   ```java
   @ManyToMany(mappedBy = "categories")
   @JsonBackReference
@@ -78,4 +78,4 @@ In addition to relationships, the following considerations have been made
   - `PostPersist` called after an entity is saved on the database
   - `PostUpdate` called after an entity is updated in the database
 
-- Themes with same considerations as Categories
+- `Themes` entity with same considerations as Categories
