@@ -14,6 +14,8 @@
 
 To run App, development `env` file must be chosen (copy `.example.env` file)
 
+[Info about environment in this project](./docs/Environment.md)
+
 `sudo docker compose --env-file ./.env.development up`
 
 To stop App

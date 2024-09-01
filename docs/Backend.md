@@ -6,15 +6,6 @@ Implemented with Spring Boot, FastAPI, Spring Security and Keycloak. Currently u
 
 ### Setup
 
-#### On Docker
-
-1. To create automatically databases and users for the `docker compose` command, is needed to run `generate_initdb.sh`
-```bash
-source .example.env # load env variables on terminal session
-mkdir ./backend/mysql/initdb
-bash ./backend/mysql/generate_initdb.sh
-```
-
 #### On current System
 
 1. Install `mysql` on system, `docker` has already available images.
@@ -35,6 +26,15 @@ CREATE USER IF NOT EXISTS 'blog'@'%' IDENTIFIED WITH 'caching_sha2_password' BY 
 CREATE DATABASE IF NOT EXISTS blog_service;
 GRANT ALL PRIVILEGES ON blog_service.* TO 'blog'@'%';
 FLUSH PRIVILEGES;
+```
+
+#### On Docker
+
+1. To create automatically databases and users for the `docker compose` command, is needed to run `generate_initdb.sh`
+```bash
+export ENV_FILE=.env.development # change with custom env files
+mkdir ./backend/mysql/initdb
+bash ./backend/mysql/generate_initdb.sh
 ```
 
 ## Keycloak OAuthServer
@@ -109,7 +109,7 @@ keycloak:
 ### Postman auth endpoint testing
 
 - Get JWT Token
-  - POST `http://localhost:9000/realms/realmName/protocol/openid-connect/token` Body `x-www-form-urlencoded`
+  - POST `http://localhost:8080/realms/realmName/protocol/openid-connect/token` Body `x-www-form-urlencoded`
   - grant_type: password
   - client_id: clientName
   - username: userName
