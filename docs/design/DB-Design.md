@@ -2,7 +2,7 @@
 
 Next picture describe relationship between entities
 
-<img src="../source/DB_Design.webp" width="700">
+<img src="../source/DB_Design.webp" width="800" style="display: block; margin: 0 auto">
 
 In addition to relationships, the following considerations have been made
 
