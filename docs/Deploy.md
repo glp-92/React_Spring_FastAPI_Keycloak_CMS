@@ -1,6 +1,6 @@
 # Deploy CMS
 
-## Disclaimer
+## About Cybersecurity
 
 :exclamation: Cybersecurity is a cornerstone of any development. Ensuring the integrity, availability, and security of services, as well as protecting customer and their data, is mandatory. While this repository provides guidelines to reduce the attack surface, it's impossible to guarantee 100% system security. Continuous learning and the implementation of a secure software development lifecycle are highly recommended.
 

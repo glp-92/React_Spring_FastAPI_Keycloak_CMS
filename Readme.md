@@ -9,10 +9,12 @@ CMS from scratch using
 
 ## App Design
 
-Documents for the project design are the following
+Documents for project design are the following
 
 [SQL Database Design and Spring annotations](./docs/design/DB-Design.md)
 
-## Run App
+[System Design with Architecture Diagram](./docs/design/System-Design.md)
+
+## Deploy App
 
 Visit [Deploy Guide](./docs/Deploy.md) to run server instance. Tested on `Ubuntu 22.04 Desktop` and `Ubuntu 22.04 Server`
