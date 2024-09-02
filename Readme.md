@@ -1,4 +1,4 @@
-# React Spring FastAPI Keycloak CMS
+# FullStack CMS
 
 CMS from scratch using 
   - [React with Vite](https://vitejs.dev/) as frontend
