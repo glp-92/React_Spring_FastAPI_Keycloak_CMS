@@ -6,10 +6,6 @@
 - `Keycloak` production mode, optimized for VPS with low resource (start-dev throws 404 error ocasionally)
 - Instructions for `Ubuntu Server` hardening, `Docker` hardening and `Nginx` hardening
 
-[Frontend Docs](/frontend/Readme.md)
-
-[Backend Docs](/backend/Readme.md)
-
 ## Run / Stop App
 
 To run App, development `env` file must be chosen (copy `.example.env` file)
