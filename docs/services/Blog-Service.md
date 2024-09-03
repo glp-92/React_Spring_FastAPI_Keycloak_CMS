@@ -8,7 +8,7 @@
 2. If using `Eclipse IDE` `boot dashboard` is useful to launch server. Go to Eclipse marketplace and install `Spring Tools 4`. Once installed `Window` => `Show view` => `Other` => `Boot Dashboard`
 3. Install `Java JDK`
 ```bash
-sudo apt reinstall openjdk-17-jd
+sudo apt reinstall openjdk-17-jdk
 ```
 3. `Project Lombok` is not installed in Eclipse
   1. Download .jar `https://projectlombok.org/download`
