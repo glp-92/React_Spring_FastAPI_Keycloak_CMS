@@ -64,7 +64,7 @@ keycloak:
     image: quay.io/keycloak/keycloak:latest
     command: start-dev --proxy-headers forwarded --import-realm
     volumes:
-      - ./backend/auth-service/:/opt/keycloak/data/import
+      - ./backend/auth-service/realm-data:/opt/keycloak/data/import
 ```
 
 ### Postman auth endpoint testing
