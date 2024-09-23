@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/user/**").hasRole(USER).requestMatchers(HttpMethod.GET,
                                 "/api/admin-and-user/**").hasAnyRole(ADMIN,USER)
                 .anyRequest().authenticated());*/
-    	http.csrf(csrf -> csrf.ignoringRequestMatchers("/blog/comment", "/blog/login", "/blog/refresh")); // Permite el posteo anonimo a comentarios, securizar esta entrada
+    	http.csrf(csrf -> csrf.ignoringRequestMatchers("/blog/login", "/blog/refresh")); // Permite el posteo anonimo a comentarios, securizar esta entrada
     	http.sessionManagement(sess -> sess.sessionCreationPolicy(
                 SessionCreationPolicy.STATELESS));
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter)));
